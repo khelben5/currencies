@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eduardodev.currencies.R
-import com.eduardodev.currencies.presentation.longToast
+import com.eduardodev.currencies.presentation.extension.longToast
 import com.eduardodev.currencies.presentation.model.Conversion
 import com.eduardodev.currencies.presentation.repository.DataResource
 import com.eduardodev.currencies.presentation.repository.Failure
