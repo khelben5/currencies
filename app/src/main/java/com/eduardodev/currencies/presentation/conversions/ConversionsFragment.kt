@@ -8,7 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eduardodev.currencies.R
+import com.eduardodev.currencies.presentation.longToast
 import com.eduardodev.currencies.presentation.model.Conversion
+import com.eduardodev.currencies.presentation.repository.DataResource
+import com.eduardodev.currencies.presentation.repository.Failure
+import com.eduardodev.currencies.presentation.repository.Loading
+import com.eduardodev.currencies.presentation.repository.Success
 import kotlinx.android.synthetic.main.fragment_conversions.*
 
 
@@ -34,11 +39,26 @@ class ConversionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         conversionsRecyclerView.adapter = ConversionsAdapter()
         model.conversions.observe(this, Observer {
-            it?.let { conversions -> onConversionsUpdate(conversions) }
+            it?.let { resource -> onConversionsUpdate(resource) }
         })
     }
 
-    private fun onConversionsUpdate(conversions: List<Conversion>) {
-        adapter.updateConversions(conversions)
+    private fun onConversionsUpdate(resource: DataResource) {
+        when (resource) {
+            is Success<*> -> {
+                setLoading(false)
+                val conversions = (resource.data as List<*>).mapNotNull { it as? Conversion }
+                adapter.updateConversions(conversions)
+            }
+            is Failure -> {
+                setLoading(false)
+                longToast(getString(R.string.error_message))
+            }
+            is Loading -> setLoading(true)
+        }
+    }
+
+    private fun setLoading(loading: Boolean) {
+        conversionsProgress.visibility = if (loading) View.VISIBLE else View.GONE
     }
 }

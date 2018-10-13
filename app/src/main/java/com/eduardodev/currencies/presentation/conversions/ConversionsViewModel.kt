@@ -3,23 +3,26 @@ package com.eduardodev.currencies.presentation.conversions
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eduardodev.currencies.data.RatesRepositoryImpl
+import com.eduardodev.currencies.data.repository.NetworkRatesRepository
 import com.eduardodev.currencies.presentation.factory.ConversionFactory
-import com.eduardodev.currencies.presentation.model.Conversion
 import com.eduardodev.currencies.presentation.model.Rate
-import com.eduardodev.currencies.presentation.repository.RatesRepository
+import com.eduardodev.currencies.presentation.repository.*
 
 
-class ConversionsViewModel(repository: RatesRepository = RatesRepositoryImpl()) : ViewModel() {
+class ConversionsViewModel(repository: RatesRepository = NetworkRatesRepository()) : ViewModel() {
 
-    private val rates: LiveData<List<Rate>> = repository.getRates()
+    private val rates: LiveData<DataResource> = repository.getRates()
 
-    val conversions: LiveData<List<Conversion>> = Transformations.map(rates) {
-        ConversionFactory().createFromRates(it)
-    }
-
-    fun selectCurrency() {
-        // todo
+    val conversions: LiveData<DataResource> = Transformations.map(rates) {
+        when (it) {
+            is Success<*> -> {
+                val rates = (it.data as List<*>).mapNotNull { rate -> rate as? Rate }
+                val conversions = ConversionFactory().createFromRates(rates)
+                Success(conversions)
+            }
+            is Failure -> Failure(it.error)
+            is Loading -> Loading
+        }
     }
 
 }
