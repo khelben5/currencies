@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.eduardodev.currencies.R
 import com.eduardodev.currencies.presentation.model.Conversion
+import org.jetbrains.anko.find
 
 
 class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
@@ -32,10 +33,12 @@ class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionVie
 
 
     class ConversionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val currencyCode = itemView.findViewById<TextView>(R.id.itemConversionCurrencyCode)
+        private val currencyCode = itemView.find<TextView>(R.id.itemConversionCurrencyCode)
+        private val currencyName = itemView.find<TextView>(R.id.itemConversionCurrencyName)
 
         fun bind(conversion: Conversion) {
-            currencyCode.text = conversion.currencyCode
+            currencyCode.text = conversion.currency.currencyCode
+            currencyName.text = conversion.currency.displayName
         }
     }
 }
