@@ -46,19 +46,21 @@ class ConversionsFragment : Fragment() {
     private fun onConversionsUpdate(resource: DataResource) {
         when (resource) {
             is Success<*> -> {
-                setLoading(false)
+                stopLoading()
                 val conversions = (resource.data as List<*>).mapNotNull { it as? Conversion }
                 adapter.updateConversions(conversions)
             }
             is Failure -> {
-                setLoading(false)
+                stopLoading()
                 longToast(getString(R.string.error_message))
             }
-            is Loading -> setLoading(true)
+            is Loading -> {
+                // Nothing to do.
+            }
         }
     }
 
-    private fun setLoading(loading: Boolean) {
-        conversionsProgress.visibility = if (loading) View.VISIBLE else View.GONE
+    private fun stopLoading() {
+        conversionsProgress.visibility = View.GONE
     }
 }
