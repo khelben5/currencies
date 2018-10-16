@@ -8,9 +8,11 @@ import android.widget.TextView
 import com.eduardodev.currencies.R
 import com.eduardodev.currencies.presentation.model.Conversion
 import org.jetbrains.anko.find
+import java.text.DecimalFormat
 
 
-class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
+class ConversionsAdapter(private val onConversionSelected: (Conversion) -> Unit)
+    : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
 
     private val conversions = emptyList<Conversion>().toMutableList()
 
@@ -20,10 +22,11 @@ class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionVie
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ConversionViewHolder(
-            LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_conversion, parent, false)
-    )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversionViewHolder {
+        val itemView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_conversion, parent, false)
+        return ConversionViewHolder(itemView, onConversionSelected)
+    }
 
     override fun getItemCount() = conversions.size
 
@@ -32,13 +35,30 @@ class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionVie
     }
 
 
-    class ConversionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ConversionViewHolder(
+            itemView: View,
+            onItemSelected: (Conversion) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
+
+        private val rootView = itemView.find<View>(R.id.itemConversionRoot)
         private val currencyCode = itemView.find<TextView>(R.id.itemConversionCurrencyCode)
         private val currencyName = itemView.find<TextView>(R.id.itemConversionCurrencyName)
+        private val rate = itemView.find<TextView>(R.id.itemConversionRate)
+
+        private lateinit var conversion: Conversion
+
+        init {
+            rootView.setOnClickListener { onItemSelected(conversion) }
+        }
 
         fun bind(conversion: Conversion) {
-            currencyCode.text = conversion.currency.currencyCode
-            currencyName.text = conversion.currency.displayName
+            this.conversion = conversion
+            currencyCode.text = conversion.rate.currency.currencyCode
+            currencyName.text = conversion.rate.currency.displayName
+            rate.text = DecimalFormat().apply {
+                minimumFractionDigits = 2
+                maximumFractionDigits = 2
+            }.format(conversion.rate.value)
         }
     }
 }

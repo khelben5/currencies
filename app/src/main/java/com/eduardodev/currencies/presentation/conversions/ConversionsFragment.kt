@@ -39,7 +39,7 @@ class ConversionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        model.conversions.observe(this, Observer {
+        model.getConversions().observe(this, Observer {
             it?.let { resource -> onConversionsUpdate(resource) }
         })
     }
@@ -48,7 +48,7 @@ class ConversionsFragment : Fragment() {
         val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         conversionsRecyclerView.setHasFixedSize(true)
         conversionsRecyclerView.addItemDecoration(decoration)
-        conversionsRecyclerView.adapter = ConversionsAdapter()
+        conversionsRecyclerView.adapter = ConversionsAdapter(::onConversionSelected)
     }
 
     private fun onConversionsUpdate(resource: DataResource) {
@@ -70,5 +70,9 @@ class ConversionsFragment : Fragment() {
 
     private fun stopLoading() {
         conversionsProgress.visibility = View.GONE
+    }
+
+    private fun onConversionSelected(conversion: Conversion) {
+        model.selectConversion(conversion)
     }
 }

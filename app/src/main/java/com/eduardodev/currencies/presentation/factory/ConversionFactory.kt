@@ -8,5 +8,5 @@ class ConversionFactory {
 
     fun createFromRates(rates: List<Rate>) = rates.map(::createFromRate)
 
-    private fun createFromRate(rate: Rate) = Conversion(rate.currency)
+    private fun createFromRate(rate: Rate) = Conversion(rate)
 }
