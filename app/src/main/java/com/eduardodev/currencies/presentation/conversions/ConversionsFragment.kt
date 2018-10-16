@@ -74,6 +74,7 @@ class ConversionsFragment : Fragment() {
     }
 
     private fun onConversionSelected(conversion: Conversion) {
+        conversionsRecyclerView.smoothScrollToPosition(0)
         model.selectConversion(conversion)
     }
 }
