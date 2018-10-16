@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,10 +38,17 @@ class ConversionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        conversionsRecyclerView.adapter = ConversionsAdapter()
+        setupRecyclerView()
         model.conversions.observe(this, Observer {
             it?.let { resource -> onConversionsUpdate(resource) }
         })
+    }
+
+    private fun setupRecyclerView() {
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        conversionsRecyclerView.setHasFixedSize(true)
+        conversionsRecyclerView.addItemDecoration(decoration)
+        conversionsRecyclerView.adapter = ConversionsAdapter()
     }
 
     private fun onConversionsUpdate(resource: DataResource) {
