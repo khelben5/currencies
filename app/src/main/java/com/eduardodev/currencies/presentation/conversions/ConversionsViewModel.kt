@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.os.Handler
 import com.eduardodev.currencies.data.repository.NetworkRatesRepository
+import com.eduardodev.currencies.presentation.extension.asTyped
 import com.eduardodev.currencies.presentation.extension.moveItemToFirstPosition
 import com.eduardodev.currencies.presentation.factory.ConversionFactory
 import com.eduardodev.currencies.presentation.model.Conversion
@@ -51,7 +52,7 @@ class ConversionsViewModel(
     private fun onRatesReceived(ratesResource: DataResource?) {
         conversions.value = when (ratesResource) {
             is Success<*> -> {
-                val rates = (ratesResource.data as List<*>).mapNotNull { rate -> rate as? Rate }
+                val rates = (ratesResource.data as List<*>).asTyped(Rate::class)
                 val conversions = ConversionFactory().createFromRates(rates)
                 setupNextDataRequest()
                 Success(selectedConversion
@@ -71,8 +72,7 @@ class ConversionsViewModel(
     }
 
     private fun extractConversionsFromResource(resource: DataResource?) =
-            ((resource as? Success<*>)?.data as? List<*>)?.mapNotNull { it as? Conversion }
-                    ?: emptyList()
+            ((resource as? Success<*>)?.data as? List<*>)?.asTyped(Conversion::class) ?: emptyList()
 
     private fun List<Conversion>.updateWithSelected(selectedConversion: Conversion) =
             moveItemToFirstPosition {

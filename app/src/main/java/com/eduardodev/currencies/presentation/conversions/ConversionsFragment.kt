@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eduardodev.currencies.R
+import com.eduardodev.currencies.presentation.extension.asTyped
 import com.eduardodev.currencies.presentation.extension.longToast
 import com.eduardodev.currencies.presentation.model.Conversion
 import com.eduardodev.currencies.presentation.repository.DataResource
@@ -55,7 +56,7 @@ class ConversionsFragment : Fragment() {
         when (resource) {
             is Success<*> -> {
                 stopLoading()
-                val conversions = (resource.data as List<*>).mapNotNull { it as? Conversion }
+                val conversions = (resource.data as List<*>).asTyped(Conversion::class)
                 adapter.updateConversions(conversions)
             }
             is Failure -> {
