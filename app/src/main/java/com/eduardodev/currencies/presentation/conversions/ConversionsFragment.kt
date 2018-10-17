@@ -54,6 +54,16 @@ class ConversionsFragment : Fragment() {
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+        model.stopNextCall()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        model.restartNextCall()
+    }
+
     private fun setupRecyclerView() {
         conversionsRecyclerView.setHasFixedSize(true)
         conversionsRecyclerView.adapter = ConversionsAdapter(

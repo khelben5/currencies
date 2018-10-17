@@ -15,7 +15,7 @@ import java.util.*
 private const val DATA_FETCH_PERIOD_MS = 1000L
 
 class ConversionsViewModel(
-        private val repository: RatesRepository = NetworkRatesRepository()
+    private val repository: RatesRepository = NetworkRatesRepository()
 ) : ViewModel() {
 
     private val conversionList = ConversionList()
@@ -27,17 +27,21 @@ class ConversionsViewModel(
 
     private var rates: LiveData<DataResource>? = null
 
-    init {
-        loadRates()
-    }
-
     override fun onCleared() {
         super.onCleared()
         rates?.removeObserver(ratesObserver)
     }
 
     fun onUserBeganToWrite() {
+        stopNextCall()
+    }
+
+    fun stopNextCall() {
         handler.removeCallbacks(loadRatesRunnable)
+    }
+
+    fun restartNextCall() {
+        loadRates()
     }
 
     fun getConversions(): LiveData<DataResource> = conversions
