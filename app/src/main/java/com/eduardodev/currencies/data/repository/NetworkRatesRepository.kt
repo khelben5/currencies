@@ -21,7 +21,7 @@ class NetworkRatesRepository(
 
     override fun getRates(): LiveData<DataResource> = Transformations.map(networkAdapter.getRates()) {
         when (it) {
-            is NetworkSuccess<*> -> Success((it.data as RatesResponse).rates.getRates())
+            is NetworkSuccess<*> -> Success((it.data as RatesResponse).getRates())
             is NetworkFailure -> Failure(it.error)
             is NetworkLoading -> Loading
         }
