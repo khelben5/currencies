@@ -12,15 +12,19 @@ class ConversionList {
 
     fun getList(): List<Conversion> = conversions
 
-    fun getSelectedCurrency() = conversions.firstOrNull()?.rate?.currency
+    fun getSelectedCurrency() = getSelectedConversion()?.rate?.currency
 
     fun updateRates(newRates: List<Rate>) {
-        val selectedCurrency = getSelectedCurrency()
+        val selectedConversion = getSelectedConversion()
         val newConversions = newRates.map { Conversion(it, it.value) }
 
         converter.updateRates(newRates)
         updateConversions(newConversions)
-        selectedCurrency?.let { selectCurrency(it) }
+
+        selectedConversion?.let {
+            selectCurrency(it.rate.currency)
+            setValueForSelectedCurrency(it.value)
+        }
     }
 
     fun selectCurrency(currency: Currency) {
@@ -41,4 +45,6 @@ class ConversionList {
         conversions.clear()
         conversions.addAll(newConversions)
     }
+
+    private fun getSelectedConversion() = conversions.firstOrNull()
 }

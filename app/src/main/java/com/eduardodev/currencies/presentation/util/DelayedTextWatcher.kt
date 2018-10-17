@@ -7,7 +7,8 @@ import android.text.TextWatcher
 
 class DelayedTextWatcher(
         private val delayInMs: Long,
-        private val onTextChanged: (newText: String) -> Unit
+        private val onTextChanged: (newText: String) -> Unit,
+        private val onWaiting: () -> Unit
 ) : TextWatcher {
 
     private val handler = Handler()
@@ -17,6 +18,7 @@ class DelayedTextWatcher(
 
     override fun afterTextChanged(s: Editable) {
         newText = s.toString()
+        onWaiting()
         handler.removeCallbacks(runnable)
         handler.postDelayed(runnable, delayInMs)
     }

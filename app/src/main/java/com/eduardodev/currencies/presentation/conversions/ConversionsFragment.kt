@@ -32,13 +32,11 @@ class ConversionsFragment : Fragment() {
         ViewModelProviders.of(this)[ConversionsViewModel::class.java]
     }
 
-    private val delayedTextWatcher = DelayedTextWatcher(TEXT_DELAY_MS) {
-        val newValue = it.toDoubleOrNull()
-        if (newValue == null)
-            longToast(getString(R.string.error_wrong_format))
-        else
-            model.setValueForSelectedCurrency(newValue)
-    }
+    private val delayedTextWatcher = DelayedTextWatcher(
+            TEXT_DELAY_MS,
+            ::onValueFinallyChanged,
+            ::onUserBeganToWrite
+    )
 
     private val adapter get() = conversionsRecyclerView.adapter as ConversionsAdapter
 
@@ -90,5 +88,17 @@ class ConversionsFragment : Fragment() {
     private fun onCurrencySelected(currency: Currency) {
         conversionsRecyclerView.smoothScrollToPosition(0)
         model.selectCurrency(currency)
+    }
+
+    private fun onUserBeganToWrite() {
+        model.onUserBeganToWrite()
+    }
+
+    private fun onValueFinallyChanged(value: String) {
+        val newValue = value.toDoubleOrNull()
+        if (newValue == null)
+            longToast(getString(R.string.error_wrong_format))
+        else
+            model.setValueForSelectedCurrency(newValue)
     }
 }

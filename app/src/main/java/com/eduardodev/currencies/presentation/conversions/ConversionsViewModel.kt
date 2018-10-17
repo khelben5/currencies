@@ -12,7 +12,7 @@ import com.eduardodev.currencies.presentation.model.Rate
 import com.eduardodev.currencies.presentation.repository.*
 import java.util.*
 
-private const val DATA_FETCH_PERIOD_MS = 10 * 60 * 1000L
+private const val DATA_FETCH_PERIOD_MS = 1000L
 
 class ConversionsViewModel(
         private val repository: RatesRepository = NetworkRatesRepository()
@@ -21,6 +21,7 @@ class ConversionsViewModel(
     private val conversionList = ConversionList()
 
     private val handler = Handler()
+    private val loadRatesRunnable = Runnable { loadRates() }
     private val ratesObserver = Observer<DataResource>(::onRatesReceived)
     private val conversions = MutableLiveData<DataResource>()
 
@@ -35,6 +36,10 @@ class ConversionsViewModel(
         rates?.removeObserver(ratesObserver)
     }
 
+    fun onUserBeganToWrite() {
+        handler.removeCallbacks(loadRatesRunnable)
+    }
+
     fun getConversions(): LiveData<DataResource> = conversions
 
     fun selectCurrency(currency: Currency) {
@@ -45,6 +50,7 @@ class ConversionsViewModel(
     fun setValueForSelectedCurrency(value: Double) {
         conversionList.setValueForSelectedCurrency(value)
         conversions.value = Success(conversionList.getList())
+        loadRates()
     }
 
     private fun loadRates() {
@@ -84,6 +90,6 @@ class ConversionsViewModel(
     }
 
     private fun setupNextDataRequest() {
-        handler.postDelayed(::loadRates, DATA_FETCH_PERIOD_MS)
+        handler.postDelayed(loadRatesRunnable, DATA_FETCH_PERIOD_MS)
     }
 }
