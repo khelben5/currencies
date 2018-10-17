@@ -15,7 +15,7 @@
         android:layout_marginEnd="8dp"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/itemConversionRate"
+        app:layout_constraintEnd_toStartOf="@id/itemConversionValueLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="GBP" />
@@ -33,16 +33,23 @@
         app:layout_constraintTop_toBottomOf="@id/itemConversionCurrencyCode"
         tools:text="British Pound" />
 
-    <TextView
-        android:id="@+id/itemConversionRate"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/itemConversionValueLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/itemConversionCurrencyName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/itemConversionCurrencyCode"
-        tools:text="9.45" />
+        app:layout_constraintTop_toTopOf="@id/itemConversionCurrencyCode">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/itemConversionValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="9.45" />
+
+    </android.support.design.widget.TextInputLayout>
 
 </android.support.constraint.ConstraintLayout>

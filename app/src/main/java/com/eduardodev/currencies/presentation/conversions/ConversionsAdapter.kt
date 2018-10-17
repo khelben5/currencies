@@ -1,5 +1,6 @@
 package com.eduardodev.currencies.presentation.conversions
 
+import android.support.design.widget.TextInputLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ class ConversionsAdapter(private val onConversionSelected: (Conversion) -> Unit)
 
     override fun onBindViewHolder(holder: ConversionViewHolder, position: Int) {
         holder.bind(conversions[position])
+        holder.enableInput(position == 0)
     }
 
 
@@ -43,7 +45,8 @@ class ConversionsAdapter(private val onConversionSelected: (Conversion) -> Unit)
         private val rootView = itemView.find<View>(R.id.itemConversionRoot)
         private val currencyCode = itemView.find<TextView>(R.id.itemConversionCurrencyCode)
         private val currencyName = itemView.find<TextView>(R.id.itemConversionCurrencyName)
-        private val rate = itemView.find<TextView>(R.id.itemConversionRate)
+        private val valueLayout = itemView.find<TextInputLayout>(R.id.itemConversionValueLayout)
+        private val value = itemView.find<TextView>(R.id.itemConversionValue)
 
         private lateinit var conversion: Conversion
 
@@ -55,10 +58,14 @@ class ConversionsAdapter(private val onConversionSelected: (Conversion) -> Unit)
             this.conversion = conversion
             currencyCode.text = conversion.rate.currency.currencyCode
             currencyName.text = conversion.rate.currency.displayName
-            rate.text = DecimalFormat().apply {
+            value.text = DecimalFormat().apply {
                 minimumFractionDigits = 2
                 maximumFractionDigits = 2
             }.format(conversion.rate.value)
+        }
+
+        fun enableInput(enable: Boolean) {
+            valueLayout.isEnabled = enable
         }
     }
 }
