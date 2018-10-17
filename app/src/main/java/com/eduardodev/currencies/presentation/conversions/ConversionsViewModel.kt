@@ -12,8 +12,9 @@ import com.eduardodev.currencies.presentation.factory.ConversionFactory
 import com.eduardodev.currencies.presentation.model.Conversion
 import com.eduardodev.currencies.presentation.model.Rate
 import com.eduardodev.currencies.presentation.repository.*
+import com.eduardodev.currencies.presentation.util.CurrencyConverter
 
-private const val DATA_FETCH_PERIOD_MS = 20000L
+private const val DATA_FETCH_PERIOD_MS = 1000L
 
 class ConversionsViewModel(
         private val repository: RatesRepository = NetworkRatesRepository()
@@ -22,8 +23,11 @@ class ConversionsViewModel(
     private val handler = Handler()
     private val ratesObserver = Observer<DataResource>(::onRatesReceived)
     private val conversions = MutableLiveData<DataResource>()
+    private val currencyConverter = CurrencyConverter()
+    private val selectedConversion
+        get() = extractConversionsFromResource(conversions.value).firstOrNull()
+
     private var rates: LiveData<DataResource>? = null
-    private var selectedConversion: Conversion? = null
 
     init {
         loadRates()
@@ -36,11 +40,21 @@ class ConversionsViewModel(
 
     fun getConversions(): LiveData<DataResource> = conversions
 
-    fun selectConversion(selectedConversion: Conversion) {
-        this.selectedConversion = selectedConversion
-        val modifiedConversions = extractConversionsFromResource(conversions.value)
-                .updateWithSelected(selectedConversion)
-        this.conversions.value = Success(modifiedConversions)
+    fun selectConversion(conversion: Conversion) {
+        conversions.value = Success(extractConversionsFromResource(conversions.value)
+                .moveItemToFirstPosition { it.rate.currency == conversion.rate.currency })
+    }
+
+    fun updateConversionsWithValue(newValue: Double) {
+        selectedConversion?.let { selectedConversion ->
+            conversions.value = Success(extractConversionsFromResource(conversions.value).map {
+                it.copy(value = currencyConverter.convert(
+                        selectedConversion.rate.currency,
+                        it.rate.currency,
+                        newValue
+                ))
+            })
+        }
     }
 
     private fun loadRates() {
@@ -50,34 +64,45 @@ class ConversionsViewModel(
     }
 
     private fun onRatesReceived(ratesResource: DataResource?) {
-        conversions.value = when (ratesResource) {
-            is Success<*> -> {
-                val rates = (ratesResource.data as List<*>).asTyped(Rate::class)
-                val conversions = ConversionFactory().createFromRates(rates)
-                setupNextDataRequest()
-                Success(selectedConversion
-                        ?.let { conversions.updateWithSelected(it) }
-                        ?: conversions)
-            }
-            is Failure -> {
-                setupNextDataRequest()
-                Failure(ratesResource.error)
-            }
-            is Loading -> Loading
-            else -> {
-                setupNextDataRequest()
-                Failure(Exception("resource is null"))
-            }
+        when (ratesResource) {
+            is Success<*> -> onSuccessResource(ratesResource)
+            is Failure -> onFailureResource(ratesResource)
+            is Loading -> onLoadingResource()
+            null -> onNullResource()
         }
+    }
+
+    private fun onSuccessResource(ratesResource: Success<*>) {
+        val rates = (ratesResource.data as List<*>).asTyped(Rate::class)
+        val conversions = ConversionFactory().createFromRates(rates)
+        currencyConverter.updateRates(rates)
+        setupNextDataRequest()
+
+        this.conversions.value = Success(
+                selectedConversion?.let { selectedConversion ->
+                    conversions.moveItemToFirstPosition {
+                        selectedConversion.rate.currency == it.rate.currency
+                    }
+                } ?: conversions
+        )
+    }
+
+    private fun onFailureResource(ratesResource: Failure) {
+        setupNextDataRequest()
+        this.conversions.value = Failure(ratesResource.error)
+    }
+
+    private fun onNullResource() {
+        setupNextDataRequest()
+        this.conversions.value = Failure(Exception("resource is null"))
+    }
+
+    private fun onLoadingResource() {
+        this.conversions.value = Loading
     }
 
     private fun extractConversionsFromResource(resource: DataResource?) =
             ((resource as? Success<*>)?.data as? List<*>)?.asTyped(Conversion::class) ?: emptyList()
-
-    private fun List<Conversion>.updateWithSelected(selectedConversion: Conversion) =
-            moveItemToFirstPosition {
-                it.rate.currency.currencyCode == selectedConversion.rate.currency.currencyCode
-            }
 
     private fun setupNextDataRequest() {
         handler.postDelayed(::loadRates, DATA_FETCH_PERIOD_MS)

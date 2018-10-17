@@ -16,8 +16,10 @@ import com.eduardodev.currencies.presentation.repository.DataResource
 import com.eduardodev.currencies.presentation.repository.Failure
 import com.eduardodev.currencies.presentation.repository.Loading
 import com.eduardodev.currencies.presentation.repository.Success
+import com.eduardodev.currencies.presentation.util.DelayedTextWatcher
 import kotlinx.android.synthetic.main.fragment_conversions.*
 
+private const val TEXT_DELAY_MS = 500L
 
 class ConversionsFragment : Fragment() {
 
@@ -27,6 +29,14 @@ class ConversionsFragment : Fragment() {
 
     private val model by lazy {
         ViewModelProviders.of(this)[ConversionsViewModel::class.java]
+    }
+
+    private val delayedTextWatcher = DelayedTextWatcher(TEXT_DELAY_MS) {
+        val newValue = it.toDoubleOrNull()
+        if (newValue == null)
+            longToast(getString(R.string.error_wrong_format))
+        else
+            model.updateConversionsWithValue(newValue)
     }
 
     private val adapter get() = conversionsRecyclerView.adapter as ConversionsAdapter
@@ -49,7 +59,10 @@ class ConversionsFragment : Fragment() {
         val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         conversionsRecyclerView.setHasFixedSize(true)
         conversionsRecyclerView.addItemDecoration(decoration)
-        conversionsRecyclerView.adapter = ConversionsAdapter(::onConversionSelected)
+        conversionsRecyclerView.adapter = ConversionsAdapter(
+                ::onConversionSelected,
+                delayedTextWatcher
+        )
     }
 
     private fun onConversionsUpdate(resource: DataResource) {
