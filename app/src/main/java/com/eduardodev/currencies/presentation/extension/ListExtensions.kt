@@ -5,22 +5,18 @@ import kotlin.reflect.full.safeCast
 
 
 /**
- * Be P the first appearance of an element in this list that matches the [predicate].
+ * Be P the first appearance of an element in this list that matches the [predicate]. This extension moves this element
+ * to the first position. If there is no element matching the [predicate], then no changes are made.
  * @param predicate The predicate to be matched.
- * @return A list where P has moved to the first position. If there's no element matching the
- * [predicate], then the same list is return.
  */
-fun <T> List<T>.moveItemToFirstPosition(predicate: (T) -> Boolean): List<T> {
+fun <T> MutableList<T>.moveItemToFirstPosition(predicate: (T) -> Boolean) {
     val index = indexOfFirst(predicate)
-    if (index <= 0) return this
+    if (index <= 0) return
 
-    val mutableList = toMutableList()
     val item = this[index]
 
-    mutableList.removeAt(index)
-    mutableList.add(0, item)
-
-    return mutableList
+    removeAt(index)
+    add(0, item)
 }
 
 /**

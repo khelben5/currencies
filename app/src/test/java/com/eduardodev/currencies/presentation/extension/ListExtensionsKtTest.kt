@@ -7,49 +7,49 @@ class ListExtensionsKtTest {
 
     @Test
     fun moveItemToFirstPosition_justOneElement() {
-        val input = listOf(4, 5, 62, 3, 5, 12)
+        val list = mutableListOf(4, 5, 62, 3, 5, 12)
         val expected = listOf(62, 4, 5, 3, 5, 12)
-        val output = input.moveItemToFirstPosition { it > 60 }
-        assertEquals(expected, output)
+        list.moveItemToFirstPosition { it > 60 }
+        assertEquals(expected, list)
     }
 
     @Test
     fun moveItemToFirstPosition_moreThanOneElement() {
-        val input = listOf(4, 5, 62, 3, 5, 12)
+        val list = mutableListOf(4, 5, 62, 3, 5, 12)
         val expected = listOf(62, 4, 5, 3, 5, 12)
-        val output = input.moveItemToFirstPosition { it > 10 }
-        assertEquals(expected, output)
+        list.moveItemToFirstPosition { it > 10 }
+        assertEquals(expected, list)
     }
 
     @Test
     fun moveItemToFirstPosition_noElements() {
-        val input = listOf(4, 5, 62, 3, 5, 12)
+        val list = mutableListOf(4, 5, 62, 3, 5, 12)
         val expected = listOf(4, 5, 62, 3, 5, 12)
-        val output = input.moveItemToFirstPosition { it > 70 }
-        assertEquals(expected, output)
+        list.moveItemToFirstPosition { it > 70 }
+        assertEquals(expected, list)
     }
 
     @Test
     fun moveItemToFirstPosition_emptyInput() {
-        val input = emptyList<Int>()
+        val list = emptyList<Int>().toMutableList()
         val expected = emptyList<Int>()
-        val output = input.moveItemToFirstPosition { it > 70 }
-        assertEquals(expected, output)
+        list.moveItemToFirstPosition { it > 70 }
+        assertEquals(expected, list)
     }
 
     @Test
     fun moveItemToFirstPosition_allElements() {
-        val input = listOf(4, 5, 62, 3, 5, 12)
+        val list = mutableListOf(4, 5, 62, 3, 5, 12)
         val expected = listOf(4, 5, 62, 3, 5, 12)
-        val output = input.moveItemToFirstPosition { it > 0 }
-        assertEquals(expected, output)
+        list.moveItemToFirstPosition { it > 0 }
+        assertEquals(expected, list)
     }
 
     @Test
     fun asTypedList_sameClasses() {
-        val input: List<Any> = listOf(4, 5, 62, 3, 5, 12)
+        val list: List<Any> = listOf(4, 5, 62, 3, 5, 12)
         val expected: List<Int> = listOf(4, 5, 62, 3, 5, 12)
-        val output = input.asTyped(Int::class)
+        val output = list.asTyped(Int::class)
         assertEquals(expected, output)
     }
 

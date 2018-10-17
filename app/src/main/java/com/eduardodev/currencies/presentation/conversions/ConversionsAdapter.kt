@@ -11,10 +11,11 @@ import com.eduardodev.currencies.R
 import com.eduardodev.currencies.presentation.model.Conversion
 import org.jetbrains.anko.find
 import java.text.DecimalFormat
+import java.util.*
 
 
 class ConversionsAdapter(
-        private val onConversionSelected: (Conversion) -> Unit,
+        private val onCurrencySelected: (Currency) -> Unit,
         private val textWatcher: TextWatcher
 ) : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
 
@@ -29,7 +30,7 @@ class ConversionsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversionViewHolder {
         val itemView = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_conversion, parent, false)
-        return ConversionViewHolder(itemView, onConversionSelected, textWatcher)
+        return ConversionViewHolder(itemView, onCurrencySelected, textWatcher)
     }
 
     override fun getItemCount() = conversions.size
@@ -41,7 +42,7 @@ class ConversionsAdapter(
 
     class ConversionViewHolder(
             itemView: View,
-            onItemSelected: (Conversion) -> Unit,
+            onCurrencySelected: (Currency) -> Unit,
             private val textWatcher: TextWatcher
     ) : RecyclerView.ViewHolder(itemView) {
 
@@ -54,7 +55,7 @@ class ConversionsAdapter(
         private val value = itemView.find<TextView>(R.id.itemConversionValue)
 
         init {
-            rootView.setOnClickListener { onItemSelected(conversion) }
+            rootView.setOnClickListener { onCurrencySelected(conversion.rate.currency) }
         }
 
         fun bind(conversion: Conversion, enabled: Boolean) {
@@ -67,7 +68,7 @@ class ConversionsAdapter(
             value.text = DecimalFormat().apply {
                 minimumFractionDigits = 2
                 maximumFractionDigits = 2
-            }.format(conversion.value ?: conversion.rate.value)
+            }.format(conversion.value)
 
             if (enabled) {
                 valueLayout.isEnabled = true

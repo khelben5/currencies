@@ -18,6 +18,7 @@ import com.eduardodev.currencies.presentation.repository.Loading
 import com.eduardodev.currencies.presentation.repository.Success
 import com.eduardodev.currencies.presentation.util.DelayedTextWatcher
 import kotlinx.android.synthetic.main.fragment_conversions.*
+import java.util.*
 
 private const val TEXT_DELAY_MS = 500L
 
@@ -36,7 +37,7 @@ class ConversionsFragment : Fragment() {
         if (newValue == null)
             longToast(getString(R.string.error_wrong_format))
         else
-            model.updateConversionsWithValue(newValue)
+            model.setValueForSelectedCurrency(newValue)
     }
 
     private val adapter get() = conversionsRecyclerView.adapter as ConversionsAdapter
@@ -60,7 +61,7 @@ class ConversionsFragment : Fragment() {
         conversionsRecyclerView.setHasFixedSize(true)
         conversionsRecyclerView.addItemDecoration(decoration)
         conversionsRecyclerView.adapter = ConversionsAdapter(
-                ::onConversionSelected,
+                ::onCurrencySelected,
                 delayedTextWatcher
         )
     }
@@ -86,8 +87,8 @@ class ConversionsFragment : Fragment() {
         conversionsProgress.visibility = View.GONE
     }
 
-    private fun onConversionSelected(conversion: Conversion) {
+    private fun onCurrencySelected(currency: Currency) {
         conversionsRecyclerView.smoothScrollToPosition(0)
-        model.selectConversion(conversion)
+        model.selectCurrency(currency)
     }
 }
