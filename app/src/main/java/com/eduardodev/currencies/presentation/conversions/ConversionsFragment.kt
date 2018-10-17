@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,8 @@ import com.eduardodev.currencies.presentation.util.DelayedTextWatcher
 import kotlinx.android.synthetic.main.fragment_conversions.*
 import java.util.*
 
-private const val TEXT_DELAY_MS = 500L
+private const val TEXT_DELAY_MS = 1000L
+private const val SCROLL_DELAY_MS = 1000L
 
 class ConversionsFragment : Fragment() {
 
@@ -33,17 +33,17 @@ class ConversionsFragment : Fragment() {
     }
 
     private val delayedTextWatcher = DelayedTextWatcher(
-            TEXT_DELAY_MS,
-            ::onValueFinallyChanged,
-            ::onUserBeganToWrite
+        TEXT_DELAY_MS,
+        ::onValueFinallyChanged,
+        ::onUserBeganToWrite
     )
 
     private val adapter get() = conversionsRecyclerView.adapter as ConversionsAdapter
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.fragment_conversions, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,12 +55,10 @@ class ConversionsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         conversionsRecyclerView.setHasFixedSize(true)
-        conversionsRecyclerView.addItemDecoration(decoration)
         conversionsRecyclerView.adapter = ConversionsAdapter(
-                ::onCurrencySelected,
-                delayedTextWatcher
+            ::onCurrencySelected,
+            delayedTextWatcher
         )
     }
 
@@ -86,8 +84,10 @@ class ConversionsFragment : Fragment() {
     }
 
     private fun onCurrencySelected(currency: Currency) {
-        conversionsRecyclerView.smoothScrollToPosition(0)
         model.selectCurrency(currency)
+        conversionsRecyclerView.postDelayed({
+            conversionsRecyclerView.smoothScrollToPosition(0)
+        }, SCROLL_DELAY_MS)
     }
 
     private fun onUserBeganToWrite() {
