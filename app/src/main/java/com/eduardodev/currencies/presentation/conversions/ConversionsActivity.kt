@@ -25,12 +25,12 @@ class ConversionsActivity : AppCompatActivity() {
 
     private fun addConversionsFragment() {
         supportFragmentManager.beginTransaction()
-                .replace(
-                        R.id.conversionsFragmentContainer,
-                        createConversionsFragment(),
-                        TAG_FRAGMENT_CONVERSIONS
-                )
-                .commit()
+            .replace(
+                R.id.conversionsFragmentContainer,
+                createConversionsFragment(),
+                TAG_FRAGMENT_CONVERSIONS
+            )
+            .commit()
     }
 
     private fun createConversionsFragment() = ConversionsFragment.newInstance()
